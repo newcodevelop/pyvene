@@ -364,6 +364,7 @@ class BaseModel(nn.Module):
         """
         Get device of interventions and the model
         """
+        print(self.model.__class__)
         return self.model.device
 
     def count_parameters(self, include_model=False):
