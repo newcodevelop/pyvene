@@ -364,9 +364,13 @@ class BaseModel(nn.Module):
         """
         Get device of interventions and the model
         """
-        print(self.model.__class__)
-        return self.model.device
+        print(self.model.__class__.__name__)
+        
+        # return self.model.device
+        return 'cuda'
 
+
+    
     def count_parameters(self, include_model=False):
         """
         Set device of interventions and the model
