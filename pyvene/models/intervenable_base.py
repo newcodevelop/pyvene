@@ -243,7 +243,8 @@ class BaseModel(nn.Module):
         self.model = model
         self.model_config = model.config
         self.model_type = get_internal_model_type(model)
-        self.disable_model_gradients()
+        # self.disable_model_gradients() # The base model class of Intervenable gradient disables all the model gradients. we want to have the model gradients enabled, so comment this line, and use next line.
+        self.enable_model_gradients()
         self.trainable_model_parameters = {}
 
     def __str__(self):
