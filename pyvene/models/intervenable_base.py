@@ -367,7 +367,7 @@ class BaseModel(nn.Module):
         """
         # print(self.model.__class__.__name__)
         
-        return self.model.device
+        return self.model.model.device
         # return ''
 
 
