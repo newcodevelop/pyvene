@@ -99,7 +99,7 @@ class BlipWrapper(nn.Module):
 
         op_gen = None
         if labels is None:
-            question_attention_mask = torch.ones(question_embeds.size()[:-1], dtype=torch.long).to(question_embeds.device)
+            question_attention_mask = torch.ones(question_embeds_w.size()[:-1], dtype=torch.long).to(question_embeds_w.device)
             outputs = self.model_text_dec.generate(
             input_ids=bos_ids,
             eos_token_id=self.config.text_config.sep_token_id,
