@@ -8,6 +8,7 @@ from typing import Optional, Union, Tuple, Dict
 class BlipWrapper(nn.Module):
     def __init__(self, model: BlipForQuestionAnswering):
         super(BlipWrapper, self).__init__()
+        self.model = model
         self.model_vis = model.vision_model
         self.model_text_enc = model.text_encoder
         self.model_text_dec = model.text_decoder
@@ -27,6 +28,7 @@ class BlipWrapper(nn.Module):
         attention_mask: Optional[torch.LongTensor] = None,
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
+        labels: Optional[torch.LongTensor] = None,
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, Dict]:
         return_dict = return_dict if return_dict is not None else self.use_return_dict
@@ -70,15 +72,47 @@ class BlipWrapper(nn.Module):
             device=self.model_text_enc.device,
         )
 
+        if labels is not None:
+            bos_ids = labels
+
+
+        
+
+
+
+
+        
         answer_output = self.model_text_dec(
             input_ids=bos_ids,
             encoder_hidden_states=question_embeds_w,
             encoder_attention_mask=attention_mask,
             output_hidden_states=True,
+            labels=labels,
             reduction="mean",
         )
 
+        if labels is not None:
+            decoder_loss = answer_output.loss.mean() if return_dict else answer_output[0].mean()
+        else:
+            decoder_loss = None
+
+
+        op_gen = None
+        if labels is None:
+            question_attention_mask = torch.ones(question_embeds.size()[:-1], dtype=torch.long).to(question_embeds.device)
+            outputs = self.model_text_dec.generate(
+            input_ids=bos_ids,
+            eos_token_id=self.config.text_config.sep_token_id,
+            pad_token_id=self.config.text_config.pad_token_id,
+            encoder_hidden_states=question_embeds_w,
+            encoder_attention_mask=question_attention_mask,
+            )
+            op_gen = outputs
+        
+        
         return {
+            "generated_toks": op_gen,
+            "decoder_loss": decoder_loss,
             "decoder_logits": answer_output.logits,
             "image_embeds": image_embeds,
             "encoder_last_hidden_state": question_embeds.last_hidden_state,
