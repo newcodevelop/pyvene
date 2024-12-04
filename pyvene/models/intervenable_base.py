@@ -365,10 +365,10 @@ class BaseModel(nn.Module):
         """
         Get device of interventions and the model
         """
-        print(self.model.__class__.__name__)
+        # print(self.model.__class__.__name__)
         
-        # return self.model.device
-        return 'cuda'
+        return self.model.device
+        # return ''
 
 
     
